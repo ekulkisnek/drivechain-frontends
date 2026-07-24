@@ -70,15 +70,10 @@ func (h *Handler) Withdraw(ctx context.Context, req *connect.Request[pb.Withdraw
 }
 
 func (h *Handler) Transfer(ctx context.Context, req *connect.Request[pb.TransferRequest]) (*connect.Response[pb.TransferResponse], error) {
-	// BitNames transfer accepts [dest, value, fee, memo, idempotency_key]
+	// BitNames transfer accepts [dest, value, fee, memo]
 	params := []any{req.Msg.Address, req.Msg.AmountSats, req.Msg.FeeSats}
 	if req.Msg.Memo != nil {
 		params = append(params, *req.Msg.Memo)
-	} else {
-		params = append(params, nil)
-	}
-	if req.Msg.IdempotencyKey != nil {
-		params = append(params, *req.Msg.IdempotencyKey)
 	} else {
 		params = append(params, nil)
 	}
@@ -232,23 +227,6 @@ func (h *Handler) GetBitNameData(ctx context.Context, req *connect.Request[pb.Ge
 	return connect.NewResponse(&pb.GetBitNameDataResponse{DataJson: string(raw)}), nil
 }
 
-func (h *Handler) GetBitNameDataAtPosition(ctx context.Context, req *connect.Request[pb.GetBitNameDataAtPositionRequest]) (*connect.Response[pb.GetBitNameDataAtPositionResponse], error) {
-	params := []any{req.Msg.Bitname, req.Msg.BlockHash, req.Msg.TxIndex}
-	raw, err := h.proxy.Client.CallRaw(ctx, "bitname_data_at_position", params)
-	if err != nil {
-		return nil, err
-	}
-	return connect.NewResponse(&pb.GetBitNameDataAtPositionResponse{DataJson: string(raw)}), nil
-}
-
-func (h *Handler) GetTransactionInfo(ctx context.Context, req *connect.Request[pb.GetTransactionInfoRequest]) (*connect.Response[pb.GetTransactionInfoResponse], error) {
-	raw, err := h.proxy.Client.CallRaw(ctx, "get_transaction_info", req.Msg.Txid)
-	if err != nil {
-		return nil, err
-	}
-	return connect.NewResponse(&pb.GetTransactionInfoResponse{TransactionInfoJson: string(raw)}), nil
-}
-
 func (h *Handler) ListBitNames(ctx context.Context, req *connect.Request[pb.ListBitNamesRequest]) (*connect.Response[pb.ListBitNamesResponse], error) {
 	raw, err := h.proxy.Client.CallRaw(ctx, "bitnames", nil)
 	if err != nil {
@@ -322,38 +300,6 @@ func (h *Handler) GetPaymail(ctx context.Context, req *connect.Request[pb.GetPay
 	return connect.NewResponse(&pb.GetPaymailResponse{PaymailJson: string(raw)}), nil
 }
 
-func (h *Handler) GetPaymailEntries(ctx context.Context, req *connect.Request[pb.GetPaymailEntriesRequest]) (*connect.Response[pb.GetPaymailEntriesResponse], error) {
-	raw, err := h.proxy.Client.CallRaw(ctx, "get_paymail_entries", nil)
-	if err != nil {
-		return nil, err
-	}
-	return connect.NewResponse(&pb.GetPaymailEntriesResponse{EntriesJson: string(raw)}), nil
-}
-
-func (h *Handler) ResolveBitName(ctx context.Context, req *connect.Request[pb.ResolveBitNameRequest]) (*connect.Response[pb.ResolveBitNameResponse], error) {
-	raw, err := h.proxy.Client.CallRaw(ctx, "resolve_bitname", []any{req.Msg.Bitname})
-	if err != nil {
-		return nil, err
-	}
-	if string(raw) == "null" {
-		return connect.NewResponse(&pb.ResolveBitNameResponse{}), nil
-	}
-	return connect.NewResponse(&pb.ResolveBitNameResponse{ResolutionJson: string(raw)}), nil
-}
-
-func (h *Handler) UpdateBitName(ctx context.Context, req *connect.Request[pb.UpdateBitNameRequest]) (*connect.Response[pb.UpdateBitNameResponse], error) {
-	var updates any
-	if err := json.Unmarshal([]byte(req.Msg.UpdatesJson), &updates); err != nil {
-		return nil, fmt.Errorf("unmarshal BitName updates: %w", err)
-	}
-	var txid string
-	params := []any{req.Msg.Bitname, updates, req.Msg.FeeSats}
-	if err := h.proxy.Client.Call(ctx, "update_bitname", params, &txid); err != nil {
-		return nil, err
-	}
-	return connect.NewResponse(&pb.UpdateBitNameResponse{Txid: txid}), nil
-}
-
 func (h *Handler) ResolveCommit(ctx context.Context, req *connect.Request[pb.ResolveCommitRequest]) (*connect.Response[pb.ResolveCommitResponse], error) {
 	var commitment string
 	if err := h.proxy.Client.Call(ctx, "resolve_commit", req.Msg.Bitname, &commitment); err != nil {
@@ -384,15 +330,6 @@ func (h *Handler) SignArbitraryMsgAsAddr(ctx context.Context, req *connect.Reque
 		VerifyingKey: result.VerifyingKey,
 		Signature:    result.Signature,
 	}), nil
-}
-
-func (h *Handler) VerifySignature(ctx context.Context, req *connect.Request[pb.VerifySignatureRequest]) (*connect.Response[pb.VerifySignatureResponse], error) {
-	var valid bool
-	params := []any{req.Msg.Signature, req.Msg.VerifyingKey, req.Msg.Domain, req.Msg.Msg}
-	if err := h.proxy.Client.Call(ctx, "verify_signature", params, &valid); err != nil {
-		return nil, err
-	}
-	return connect.NewResponse(&pb.VerifySignatureResponse{Valid: valid}), nil
 }
 
 func (h *Handler) GetWalletAddresses(ctx context.Context, req *connect.Request[pb.GetWalletAddressesRequest]) (*connect.Response[pb.GetWalletAddressesResponse], error) {

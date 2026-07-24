@@ -145,8 +145,8 @@ func (c *Client) MyUTXOs(ctx context.Context) (json.RawMessage, error) {
 }
 
 // Transfer sends funds.
-func (c *Client) Transfer(ctx context.Context, dest string, valueSats, feeSats int64, memo, idempotencyKey *string) (string, error) {
-	params := []interface{}{dest, valueSats, feeSats, memo, idempotencyKey}
+func (c *Client) Transfer(ctx context.Context, dest string, valueSats, feeSats int64, memo *string) (string, error) {
+	params := []interface{}{dest, valueSats, feeSats, memo}
 	return unmarshal[string](c, ctx, "transfer", params)
 }
 
@@ -185,11 +185,6 @@ func (c *Client) BitNameData(ctx context.Context, name string) (*BitNameData, er
 	return &d, nil
 }
 
-// BitNameDataAtPosition retrieves BitName data at an exact block/transaction position.
-func (c *Client) BitNameDataAtPosition(ctx context.Context, bitname, blockHash string, txIndex uint32) (BitNameData, error) {
-	return unmarshal[BitNameData](c, ctx, "bitname_data_at_position", []interface{}{bitname, blockHash, txIndex})
-}
-
 // ListBitNames returns all registered BitNames.
 func (c *Client) ListBitNames(ctx context.Context) ([]BitnameEntry, error) {
 	return unmarshal[[]BitnameEntry](c, ctx, "bitnames", nil)
@@ -208,28 +203,6 @@ func (c *Client) ReserveBitName(ctx context.Context, name string) (string, error
 // ResolveCommit resolves a commitment from a BitName.
 func (c *Client) ResolveCommit(ctx context.Context, bitname string) (string, error) {
 	return unmarshal[string](c, ctx, "resolve_commit", bitname)
-}
-
-// ResolveBitName returns the current ownership output and data for a BitName.
-func (c *Client) ResolveBitName(ctx context.Context, bitname string) (*BitNameResolution, error) {
-	raw, err := c.call(ctx, "resolve_bitname", []interface{}{bitname})
-	if err != nil {
-		return nil, err
-	}
-	if string(raw) == "null" {
-		return nil, nil
-	}
-	var resolution BitNameResolution
-	if err := json.Unmarshal(raw, &resolution); err != nil {
-		return nil, fmt.Errorf("decode resolve_bitname result: %w", err)
-	}
-	return &resolution, nil
-}
-
-// UpdateBitName changes mutable data for an owned BitName.
-func (c *Client) UpdateBitName(ctx context.Context, bitname string, updates BitNameDataUpdates, feeSats int64) (string, error) {
-	params := []interface{}{bitname, updates, feeSats}
-	return unmarshal[string](c, ctx, "update_bitname", params)
 }
 
 // ---------------------------------------------------------------------------
@@ -374,15 +347,6 @@ func (c *Client) SignArbitraryMsgAsAddr(ctx context.Context, msg, address string
 	return &r, nil
 }
 
-// VerifySignature verifies a signature against the specified key and domain.
-func (c *Client) VerifySignature(
-	ctx context.Context,
-	signature, verifyingKey, domain, msg string,
-) (bool, error) {
-	params := []interface{}{signature, verifyingKey, domain, msg}
-	return unmarshal[bool](c, ctx, "verify_signature", params)
-}
-
 // ---------------------------------------------------------------------------
 // Paymail
 // ---------------------------------------------------------------------------
@@ -390,11 +354,6 @@ func (c *Client) VerifySignature(
 // GetPaymail returns paymail information as raw JSON.
 func (c *Client) GetPaymail(ctx context.Context) (json.RawMessage, error) {
 	return c.call(ctx, "get_paymail", nil)
-}
-
-// GetPaymailEntries returns JSON-safe, ordered paymail entries.
-func (c *Client) GetPaymailEntries(ctx context.Context) ([]PaymailEntry, error) {
-	return unmarshal[[]PaymailEntry](c, ctx, "get_paymail_entries", nil)
 }
 
 // ---------------------------------------------------------------------------

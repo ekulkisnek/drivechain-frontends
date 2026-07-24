@@ -194,22 +194,6 @@ abstract final class BitnamesService {
     bitnamesv1bitnames.GetBitNameDataResponse.new,
   );
 
-  /// Get BitName data at an exact block/transaction position.
-  static const getBitNameDataAtPosition = connect.Spec(
-    '/$name/GetBitNameDataAtPosition',
-    connect.StreamType.unary,
-    bitnamesv1bitnames.GetBitNameDataAtPositionRequest.new,
-    bitnamesv1bitnames.GetBitNameDataAtPositionResponse.new,
-  );
-
-  /// Get transaction confirmation information.
-  static const getTransactionInfo = connect.Spec(
-    '/$name/GetTransactionInfo',
-    connect.StreamType.unary,
-    bitnamesv1bitnames.GetTransactionInfoRequest.new,
-    bitnamesv1bitnames.GetTransactionInfoResponse.new,
-  );
-
   /// List all BitNames.
   static const listBitNames = connect.Spec(
     '/$name/ListBitNames',
@@ -274,30 +258,6 @@ abstract final class BitnamesService {
     bitnamesv1bitnames.GetPaymailResponse.new,
   );
 
-  /// Get JSON-safe, ordered paymail entries with recipient attribution.
-  static const getPaymailEntries = connect.Spec(
-    '/$name/GetPaymailEntries',
-    connect.StreamType.unary,
-    bitnamesv1bitnames.GetPaymailEntriesRequest.new,
-    bitnamesv1bitnames.GetPaymailEntriesResponse.new,
-  );
-
-  /// Resolve a BitName to its current ownership output and data.
-  static const resolveBitName = connect.Spec(
-    '/$name/ResolveBitName',
-    connect.StreamType.unary,
-    bitnamesv1bitnames.ResolveBitNameRequest.new,
-    bitnamesv1bitnames.ResolveBitNameResponse.new,
-  );
-
-  /// Update mutable data for an owned BitName.
-  static const updateBitName = connect.Spec(
-    '/$name/UpdateBitName',
-    connect.StreamType.unary,
-    bitnamesv1bitnames.UpdateBitNameRequest.new,
-    bitnamesv1bitnames.UpdateBitNameResponse.new,
-  );
-
   /// Resolve a commitment from a BitName.
   static const resolveCommit = connect.Spec(
     '/$name/ResolveCommit',
@@ -320,14 +280,6 @@ abstract final class BitnamesService {
     connect.StreamType.unary,
     bitnamesv1bitnames.SignArbitraryMsgAsAddrRequest.new,
     bitnamesv1bitnames.SignArbitraryMsgAsAddrResponse.new,
-  );
-
-  /// Verify a signature using the specified domain separation tag.
-  static const verifySignature = connect.Spec(
-    '/$name/VerifySignature',
-    connect.StreamType.unary,
-    bitnamesv1bitnames.VerifySignatureRequest.new,
-    bitnamesv1bitnames.VerifySignatureResponse.new,
   );
 
   /// Get wallet addresses.

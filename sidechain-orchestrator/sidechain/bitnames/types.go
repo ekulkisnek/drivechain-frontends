@@ -20,49 +20,6 @@ type BitNameData struct {
 	SocketAddrV6     *string `json:"socket_addr_v6,omitempty"`
 }
 
-// BitNameResolution identifies the current ownership output and data for a BitName.
-type BitNameResolution struct {
-	Bitname  string          `json:"bitname"`
-	Outpoint json.RawMessage `json:"outpoint"`
-	Address  string          `json:"address"`
-	Data     BitNameData     `json:"data"`
-}
-
-// BitNameDataUpdates uses the backend's Retain/Delete/{"Set": value} encoding.
-type BitNameDataUpdates struct {
-	Commitment       json.RawMessage `json:"commitment"`
-	SocketAddrV4     json.RawMessage `json:"socket_addr_v4"`
-	SocketAddrV6     json.RawMessage `json:"socket_addr_v6"`
-	EncryptionPubkey json.RawMessage `json:"encryption_pubkey"`
-	SigningPubkey    json.RawMessage `json:"signing_pubkey"`
-	PaymailFeeSats   json.RawMessage `json:"paymail_fee_sats"`
-}
-
-// PaymailRecipient identifies a BitName whose historical fee policy accepted an output.
-type PaymailRecipient struct {
-	Bitname         string      `json:"bitname"`
-	Data            BitNameData `json:"data"`
-	RequiredFeeSats *uint64     `json:"required_fee_sats"`
-}
-
-// PaymailOutput is the subset of a filled output needed by mailbox clients.
-type PaymailOutput struct {
-	Address string          `json:"address"`
-	Content json.RawMessage `json:"content"`
-	Memo    string          `json:"memo"`
-}
-
-// PaymailEntry is a JSON-safe, ordered mailbox record.
-type PaymailEntry struct {
-	Outpoint    json.RawMessage    `json:"outpoint"`
-	Output      PaymailOutput      `json:"output"`
-	ValueSats   uint64             `json:"value_sats"`
-	BlockHash   string             `json:"block_hash"`
-	BlockHeight uint32             `json:"block_height"`
-	TxIndex     uint32             `json:"tx_index"`
-	Recipients  []PaymailRecipient `json:"recipients"`
-}
-
 // BitnameDetails describes the on-chain state of a registered BitName.
 type BitnameDetails struct {
 	SeqID            string  `json:"seq_id"`

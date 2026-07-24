@@ -422,42 +422,6 @@ extension type BitnamesServiceClient (connect.Transport _transport) {
     );
   }
 
-  /// Get BitName data at an exact block/transaction position.
-  Future<bitnamesv1bitnames.GetBitNameDataAtPositionResponse> getBitNameDataAtPosition(
-    bitnamesv1bitnames.GetBitNameDataAtPositionRequest input, {
-    connect.Headers? headers,
-    connect.AbortSignal? signal,
-    Function(connect.Headers)? onHeader,
-    Function(connect.Headers)? onTrailer,
-  }) {
-    return connect.Client(_transport).unary(
-      specs.BitnamesService.getBitNameDataAtPosition,
-      input,
-      signal: signal,
-      headers: headers,
-      onHeader: onHeader,
-      onTrailer: onTrailer,
-    );
-  }
-
-  /// Get transaction confirmation information.
-  Future<bitnamesv1bitnames.GetTransactionInfoResponse> getTransactionInfo(
-    bitnamesv1bitnames.GetTransactionInfoRequest input, {
-    connect.Headers? headers,
-    connect.AbortSignal? signal,
-    Function(connect.Headers)? onHeader,
-    Function(connect.Headers)? onTrailer,
-  }) {
-    return connect.Client(_transport).unary(
-      specs.BitnamesService.getTransactionInfo,
-      input,
-      signal: signal,
-      headers: headers,
-      onHeader: onHeader,
-      onTrailer: onTrailer,
-    );
-  }
-
   /// List all BitNames.
   Future<bitnamesv1bitnames.ListBitNamesResponse> listBitNames(
     bitnamesv1bitnames.ListBitNamesRequest input, {
@@ -602,60 +566,6 @@ extension type BitnamesServiceClient (connect.Transport _transport) {
     );
   }
 
-  /// Get JSON-safe, ordered paymail entries with recipient attribution.
-  Future<bitnamesv1bitnames.GetPaymailEntriesResponse> getPaymailEntries(
-    bitnamesv1bitnames.GetPaymailEntriesRequest input, {
-    connect.Headers? headers,
-    connect.AbortSignal? signal,
-    Function(connect.Headers)? onHeader,
-    Function(connect.Headers)? onTrailer,
-  }) {
-    return connect.Client(_transport).unary(
-      specs.BitnamesService.getPaymailEntries,
-      input,
-      signal: signal,
-      headers: headers,
-      onHeader: onHeader,
-      onTrailer: onTrailer,
-    );
-  }
-
-  /// Resolve a BitName to its current ownership output and data.
-  Future<bitnamesv1bitnames.ResolveBitNameResponse> resolveBitName(
-    bitnamesv1bitnames.ResolveBitNameRequest input, {
-    connect.Headers? headers,
-    connect.AbortSignal? signal,
-    Function(connect.Headers)? onHeader,
-    Function(connect.Headers)? onTrailer,
-  }) {
-    return connect.Client(_transport).unary(
-      specs.BitnamesService.resolveBitName,
-      input,
-      signal: signal,
-      headers: headers,
-      onHeader: onHeader,
-      onTrailer: onTrailer,
-    );
-  }
-
-  /// Update mutable data for an owned BitName.
-  Future<bitnamesv1bitnames.UpdateBitNameResponse> updateBitName(
-    bitnamesv1bitnames.UpdateBitNameRequest input, {
-    connect.Headers? headers,
-    connect.AbortSignal? signal,
-    Function(connect.Headers)? onHeader,
-    Function(connect.Headers)? onTrailer,
-  }) {
-    return connect.Client(_transport).unary(
-      specs.BitnamesService.updateBitName,
-      input,
-      signal: signal,
-      headers: headers,
-      onHeader: onHeader,
-      onTrailer: onTrailer,
-    );
-  }
-
   /// Resolve a commitment from a BitName.
   Future<bitnamesv1bitnames.ResolveCommitResponse> resolveCommit(
     bitnamesv1bitnames.ResolveCommitRequest input, {
@@ -702,24 +612,6 @@ extension type BitnamesServiceClient (connect.Transport _transport) {
   }) {
     return connect.Client(_transport).unary(
       specs.BitnamesService.signArbitraryMsgAsAddr,
-      input,
-      signal: signal,
-      headers: headers,
-      onHeader: onHeader,
-      onTrailer: onTrailer,
-    );
-  }
-
-  /// Verify a signature using the specified domain separation tag.
-  Future<bitnamesv1bitnames.VerifySignatureResponse> verifySignature(
-    bitnamesv1bitnames.VerifySignatureRequest input, {
-    connect.Headers? headers,
-    connect.AbortSignal? signal,
-    Function(connect.Headers)? onHeader,
-    Function(connect.Headers)? onTrailer,
-  }) {
-    return connect.Client(_transport).unary(
-      specs.BitnamesService.verifySignature,
       input,
       signal: signal,
       headers: headers,

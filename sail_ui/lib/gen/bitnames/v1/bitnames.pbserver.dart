@@ -44,8 +44,6 @@ abstract class BitnamesServiceBase extends $pb.GeneratedService {
   $async.Future<$1.SetSeedFromMnemonicResponse> setSeedFromMnemonic($pb.ServerContext ctx, $1.SetSeedFromMnemonicRequest request);
   $async.Future<$1.CallRawResponse> callRaw($pb.ServerContext ctx, $1.CallRawRequest request);
   $async.Future<$1.GetBitNameDataResponse> getBitNameData($pb.ServerContext ctx, $1.GetBitNameDataRequest request);
-  $async.Future<$1.GetBitNameDataAtPositionResponse> getBitNameDataAtPosition($pb.ServerContext ctx, $1.GetBitNameDataAtPositionRequest request);
-  $async.Future<$1.GetTransactionInfoResponse> getTransactionInfo($pb.ServerContext ctx, $1.GetTransactionInfoRequest request);
   $async.Future<$1.ListBitNamesResponse> listBitNames($pb.ServerContext ctx, $1.ListBitNamesRequest request);
   $async.Future<$1.RegisterBitNameResponse> registerBitName($pb.ServerContext ctx, $1.RegisterBitNameRequest request);
   $async.Future<$1.ReserveBitNameResponse> reserveBitName($pb.ServerContext ctx, $1.ReserveBitNameRequest request);
@@ -54,13 +52,9 @@ abstract class BitnamesServiceBase extends $pb.GeneratedService {
   $async.Future<$1.DecryptMsgResponse> decryptMsg($pb.ServerContext ctx, $1.DecryptMsgRequest request);
   $async.Future<$1.EncryptMsgResponse> encryptMsg($pb.ServerContext ctx, $1.EncryptMsgRequest request);
   $async.Future<$1.GetPaymailResponse> getPaymail($pb.ServerContext ctx, $1.GetPaymailRequest request);
-  $async.Future<$1.GetPaymailEntriesResponse> getPaymailEntries($pb.ServerContext ctx, $1.GetPaymailEntriesRequest request);
-  $async.Future<$1.ResolveBitNameResponse> resolveBitName($pb.ServerContext ctx, $1.ResolveBitNameRequest request);
-  $async.Future<$1.UpdateBitNameResponse> updateBitName($pb.ServerContext ctx, $1.UpdateBitNameRequest request);
   $async.Future<$1.ResolveCommitResponse> resolveCommit($pb.ServerContext ctx, $1.ResolveCommitRequest request);
   $async.Future<$1.SignArbitraryMsgResponse> signArbitraryMsg($pb.ServerContext ctx, $1.SignArbitraryMsgRequest request);
   $async.Future<$1.SignArbitraryMsgAsAddrResponse> signArbitraryMsgAsAddr($pb.ServerContext ctx, $1.SignArbitraryMsgAsAddrRequest request);
-  $async.Future<$1.VerifySignatureResponse> verifySignature($pb.ServerContext ctx, $1.VerifySignatureRequest request);
   $async.Future<$1.GetWalletAddressesResponse> getWalletAddresses($pb.ServerContext ctx, $1.GetWalletAddressesRequest request);
   $async.Future<$1.MyUtxosResponse> myUtxos($pb.ServerContext ctx, $1.MyUtxosRequest request);
   $async.Future<$1.OpenapiSchemaResponse> openapiSchema($pb.ServerContext ctx, $1.OpenapiSchemaRequest request);
@@ -90,8 +84,6 @@ abstract class BitnamesServiceBase extends $pb.GeneratedService {
       case 'SetSeedFromMnemonic': return $1.SetSeedFromMnemonicRequest();
       case 'CallRaw': return $1.CallRawRequest();
       case 'GetBitNameData': return $1.GetBitNameDataRequest();
-      case 'GetBitNameDataAtPosition': return $1.GetBitNameDataAtPositionRequest();
-      case 'GetTransactionInfo': return $1.GetTransactionInfoRequest();
       case 'ListBitNames': return $1.ListBitNamesRequest();
       case 'RegisterBitName': return $1.RegisterBitNameRequest();
       case 'ReserveBitName': return $1.ReserveBitNameRequest();
@@ -100,13 +92,9 @@ abstract class BitnamesServiceBase extends $pb.GeneratedService {
       case 'DecryptMsg': return $1.DecryptMsgRequest();
       case 'EncryptMsg': return $1.EncryptMsgRequest();
       case 'GetPaymail': return $1.GetPaymailRequest();
-      case 'GetPaymailEntries': return $1.GetPaymailEntriesRequest();
-      case 'ResolveBitName': return $1.ResolveBitNameRequest();
-      case 'UpdateBitName': return $1.UpdateBitNameRequest();
       case 'ResolveCommit': return $1.ResolveCommitRequest();
       case 'SignArbitraryMsg': return $1.SignArbitraryMsgRequest();
       case 'SignArbitraryMsgAsAddr': return $1.SignArbitraryMsgAsAddrRequest();
-      case 'VerifySignature': return $1.VerifySignatureRequest();
       case 'GetWalletAddresses': return $1.GetWalletAddressesRequest();
       case 'MyUtxos': return $1.MyUtxosRequest();
       case 'OpenapiSchema': return $1.OpenapiSchemaRequest();
@@ -139,8 +127,6 @@ abstract class BitnamesServiceBase extends $pb.GeneratedService {
       case 'SetSeedFromMnemonic': return this.setSeedFromMnemonic(ctx, request as $1.SetSeedFromMnemonicRequest);
       case 'CallRaw': return this.callRaw(ctx, request as $1.CallRawRequest);
       case 'GetBitNameData': return this.getBitNameData(ctx, request as $1.GetBitNameDataRequest);
-      case 'GetBitNameDataAtPosition': return this.getBitNameDataAtPosition(ctx, request as $1.GetBitNameDataAtPositionRequest);
-      case 'GetTransactionInfo': return this.getTransactionInfo(ctx, request as $1.GetTransactionInfoRequest);
       case 'ListBitNames': return this.listBitNames(ctx, request as $1.ListBitNamesRequest);
       case 'RegisterBitName': return this.registerBitName(ctx, request as $1.RegisterBitNameRequest);
       case 'ReserveBitName': return this.reserveBitName(ctx, request as $1.ReserveBitNameRequest);
@@ -149,13 +135,9 @@ abstract class BitnamesServiceBase extends $pb.GeneratedService {
       case 'DecryptMsg': return this.decryptMsg(ctx, request as $1.DecryptMsgRequest);
       case 'EncryptMsg': return this.encryptMsg(ctx, request as $1.EncryptMsgRequest);
       case 'GetPaymail': return this.getPaymail(ctx, request as $1.GetPaymailRequest);
-      case 'GetPaymailEntries': return this.getPaymailEntries(ctx, request as $1.GetPaymailEntriesRequest);
-      case 'ResolveBitName': return this.resolveBitName(ctx, request as $1.ResolveBitNameRequest);
-      case 'UpdateBitName': return this.updateBitName(ctx, request as $1.UpdateBitNameRequest);
       case 'ResolveCommit': return this.resolveCommit(ctx, request as $1.ResolveCommitRequest);
       case 'SignArbitraryMsg': return this.signArbitraryMsg(ctx, request as $1.SignArbitraryMsgRequest);
       case 'SignArbitraryMsgAsAddr': return this.signArbitraryMsgAsAddr(ctx, request as $1.SignArbitraryMsgAsAddrRequest);
-      case 'VerifySignature': return this.verifySignature(ctx, request as $1.VerifySignatureRequest);
       case 'GetWalletAddresses': return this.getWalletAddresses(ctx, request as $1.GetWalletAddressesRequest);
       case 'MyUtxos': return this.myUtxos(ctx, request as $1.MyUtxosRequest);
       case 'OpenapiSchema': return this.openapiSchema(ctx, request as $1.OpenapiSchemaRequest);

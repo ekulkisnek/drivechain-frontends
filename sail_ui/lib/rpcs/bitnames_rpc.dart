@@ -33,13 +33,18 @@ abstract class BitnamesRPC extends SidechainRPC {
   Future<BitNameData?> getBitNameData(String name);
 
   /// Get BitName data at an exact block/transaction position.
-  Future<BitNameData> bitNameDataAtPosition(String bitname, String blockHash, int txIndex);
+  Future<BitNameData> bitNameDataAtPosition(String bitname, String blockHash, int txIndex) async {
+    final data = await callRAW('bitname_data_at_position', [bitname, blockHash, txIndex]);
+    if (data is! Map) throw const FormatException('Invalid historical BitName data');
+    return BitNameData.fromJson(Map<String, dynamic>.from(data));
+  }
 
   /// Return whether a transaction is included in the current canonical chain.
-  Future<bool> isTransactionConfirmed(String txid);
+  Future<bool> isTransactionConfirmed(String txid) async =>
+      await transactionStatus(txid) == BitnamesTransactionStatus.confirmed;
 
   Future<BitnamesTransactionStatus> transactionStatus(String txid) async =>
-      await isTransactionConfirmed(txid) ? BitnamesTransactionStatus.confirmed : BitnamesTransactionStatus.pending;
+      transactionInfoStatus(await callRAW('get_transaction_info', [txid]));
 
   /// List all BitNames
   Future<List<BitnameEntry>> listBitNames();
@@ -113,17 +118,31 @@ abstract class BitnamesRPC extends SidechainRPC {
   Future<Map<String, dynamic>> getPaymail();
 
   /// Get JSON-safe, ordered paymail entries with recipient attribution.
-  Future<List<PaymailEntry>> getPaymailEntries();
+  Future<List<PaymailEntry>> getPaymailEntries() async {
+    final entries = await callRAW('get_paymail_entries');
+    if (entries == null) return [];
+    if (entries is! List) throw const FormatException('Invalid paymail entries');
+    return entries.map((entry) => PaymailEntry.fromJson(Map<String, dynamic>.from(entry as Map))).toList();
+  }
 
   /// Resolve a BitName to its current ownership output and data.
-  Future<BitNameResolution?> resolveBitName(String bitname);
+  Future<BitNameResolution?> resolveBitName(String bitname) async {
+    final resolution = await callRAW('resolve_bitname', [bitname]);
+    if (resolution == null) return null;
+    if (resolution is! Map) throw const FormatException('Invalid BitName resolution');
+    return BitNameResolution.fromJson(Map<String, dynamic>.from(resolution));
+  }
 
   /// Update mutable data for an owned BitName.
   Future<String> updateBitName({
     required String bitname,
     required BitNameDataUpdates updates,
     required int feeSats,
-  });
+  }) async {
+    final txid = await callRAW('update_bitname', [bitname, updates.toJson(), feeSats]);
+    if (txid is! String) throw const FormatException('Invalid BitName update transaction');
+    return txid;
+  }
 
   /// Get wallet addresses, sorted by base58 encoding
   Future<List<String>> getWalletAddresses();
@@ -162,7 +181,11 @@ abstract class BitnamesRPC extends SidechainRPC {
     required String verifyingKey,
     String domain = 'arbitrary',
     required String msg,
-  });
+  }) async {
+    final valid = await callRAW('verify_signature', [signature, verifyingKey, domain, msg]);
+    if (valid is! bool) throw const FormatException('Invalid signature verification response');
+    return valid;
+  }
 
   /// Transfer funds to the specified address
   Future<String> transfer({
@@ -178,7 +201,11 @@ abstract class BitnamesRPC extends SidechainRPC {
     required int value,
     required int fee,
     String? memo,
-  }) => transfer(dest: dest, value: value, fee: fee, memo: memo);
+  }) async {
+    final txid = await callRAW('transfer', [dest, value, fee, memo, idempotencyKey]);
+    if (txid is! String) throw const FormatException('Invalid transfer transaction');
+    return txid;
+  }
 }
 
 class BitnamesLive extends BitnamesRPC {
@@ -311,25 +338,6 @@ class BitnamesLive extends BitnamesRPC {
     if (resp.dataJson.isEmpty) return null;
     final decoded = jsonDecode(resp.dataJson) as Map<String, dynamic>;
     return BitNameData.fromJson(decoded);
-  }
-
-  @override
-  Future<BitNameData> bitNameDataAtPosition(String bitname, String blockHash, int txIndex) async {
-    final resp = await _client.getBitNameDataAtPosition(
-      pb.GetBitNameDataAtPositionRequest(bitname: bitname, blockHash: blockHash, txIndex: txIndex),
-    );
-    return BitNameData.fromJson(jsonDecode(resp.dataJson) as Map<String, dynamic>);
-  }
-
-  @override
-  Future<bool> isTransactionConfirmed(String txid) async {
-    return await transactionStatus(txid) == BitnamesTransactionStatus.confirmed;
-  }
-
-  @override
-  Future<BitnamesTransactionStatus> transactionStatus(String txid) async {
-    final resp = await _client.getTransactionInfo(pb.GetTransactionInfoRequest(txid: txid));
-    return transactionInfoStatus(jsonDecode(resp.transactionInfoJson));
   }
 
   @override
@@ -556,41 +564,6 @@ class BitnamesLive extends BitnamesRPC {
   }
 
   @override
-  Future<List<PaymailEntry>> getPaymailEntries() async {
-    final resp = await _client.getPaymailEntries(pb.GetPaymailEntriesRequest());
-    if (resp.entriesJson.isEmpty) return [];
-    final decoded = jsonDecode(resp.entriesJson) as List<dynamic>;
-    return decoded.map((entry) => PaymailEntry.fromJson(entry as Map<String, dynamic>)).toList();
-  }
-
-  @override
-  Future<BitNameResolution?> resolveBitName(String bitname) async {
-    final resp = await _client.resolveBitName(
-      pb.ResolveBitNameRequest(bitname: bitname),
-    );
-    if (resp.resolutionJson.isEmpty) return null;
-    return BitNameResolution.fromJson(
-      jsonDecode(resp.resolutionJson) as Map<String, dynamic>,
-    );
-  }
-
-  @override
-  Future<String> updateBitName({
-    required String bitname,
-    required BitNameDataUpdates updates,
-    required int feeSats,
-  }) async {
-    final resp = await _client.updateBitName(
-      pb.UpdateBitNameRequest(
-        bitname: bitname,
-        updatesJson: jsonEncode(updates.toJson()),
-        feeSats: Int64(feeSats),
-      ),
-    );
-    return resp.txid;
-  }
-
-  @override
   Future<String> resolveCommit(String bitname) async {
     final resp = await _client.resolveCommit(
       pb.ResolveCommitRequest(bitname: bitname),
@@ -618,24 +591,6 @@ class BitnamesLive extends BitnamesRPC {
       pb.SignArbitraryMsgAsAddrRequest(msg: msg, address: address),
     );
     return {'verifying_key': resp.verifyingKey, 'signature': resp.signature};
-  }
-
-  @override
-  Future<bool> verifySignature({
-    required String signature,
-    required String verifyingKey,
-    String domain = 'arbitrary',
-    required String msg,
-  }) async {
-    final resp = await _client.verifySignature(
-      pb.VerifySignatureRequest(
-        signature: signature,
-        verifyingKey: verifyingKey,
-        domain: domain,
-        msg: msg,
-      ),
-    );
-    return resp.valid;
   }
 
   @override
@@ -700,26 +655,6 @@ class BitnamesLive extends BitnamesRPC {
         amountSats: Int64(value),
         feeSats: Int64(fee),
         memo: memo,
-      ),
-    );
-    return resp.txid;
-  }
-
-  @override
-  Future<String> transferIdempotent({
-    required String idempotencyKey,
-    required String dest,
-    required int value,
-    required int fee,
-    String? memo,
-  }) async {
-    final resp = await _client.transfer(
-      pb.TransferRequest(
-        address: dest,
-        amountSats: Int64(value),
-        feeSats: Int64(fee),
-        memo: memo,
-        idempotencyKey: idempotencyKey,
       ),
     );
     return resp.txid;

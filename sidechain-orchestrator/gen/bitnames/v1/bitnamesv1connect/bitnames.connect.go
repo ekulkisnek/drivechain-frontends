@@ -99,12 +99,6 @@ const (
 	// BitnamesServiceGetBitNameDataProcedure is the fully-qualified name of the BitnamesService's
 	// GetBitNameData RPC.
 	BitnamesServiceGetBitNameDataProcedure = "/bitnames.v1.BitnamesService/GetBitNameData"
-	// BitnamesServiceGetBitNameDataAtPositionProcedure is the fully-qualified name of the
-	// BitnamesService's GetBitNameDataAtPosition RPC.
-	BitnamesServiceGetBitNameDataAtPositionProcedure = "/bitnames.v1.BitnamesService/GetBitNameDataAtPosition"
-	// BitnamesServiceGetTransactionInfoProcedure is the fully-qualified name of the BitnamesService's
-	// GetTransactionInfo RPC.
-	BitnamesServiceGetTransactionInfoProcedure = "/bitnames.v1.BitnamesService/GetTransactionInfo"
 	// BitnamesServiceListBitNamesProcedure is the fully-qualified name of the BitnamesService's
 	// ListBitNames RPC.
 	BitnamesServiceListBitNamesProcedure = "/bitnames.v1.BitnamesService/ListBitNames"
@@ -129,15 +123,6 @@ const (
 	// BitnamesServiceGetPaymailProcedure is the fully-qualified name of the BitnamesService's
 	// GetPaymail RPC.
 	BitnamesServiceGetPaymailProcedure = "/bitnames.v1.BitnamesService/GetPaymail"
-	// BitnamesServiceGetPaymailEntriesProcedure is the fully-qualified name of the BitnamesService's
-	// GetPaymailEntries RPC.
-	BitnamesServiceGetPaymailEntriesProcedure = "/bitnames.v1.BitnamesService/GetPaymailEntries"
-	// BitnamesServiceResolveBitNameProcedure is the fully-qualified name of the BitnamesService's
-	// ResolveBitName RPC.
-	BitnamesServiceResolveBitNameProcedure = "/bitnames.v1.BitnamesService/ResolveBitName"
-	// BitnamesServiceUpdateBitNameProcedure is the fully-qualified name of the BitnamesService's
-	// UpdateBitName RPC.
-	BitnamesServiceUpdateBitNameProcedure = "/bitnames.v1.BitnamesService/UpdateBitName"
 	// BitnamesServiceResolveCommitProcedure is the fully-qualified name of the BitnamesService's
 	// ResolveCommit RPC.
 	BitnamesServiceResolveCommitProcedure = "/bitnames.v1.BitnamesService/ResolveCommit"
@@ -147,9 +132,6 @@ const (
 	// BitnamesServiceSignArbitraryMsgAsAddrProcedure is the fully-qualified name of the
 	// BitnamesService's SignArbitraryMsgAsAddr RPC.
 	BitnamesServiceSignArbitraryMsgAsAddrProcedure = "/bitnames.v1.BitnamesService/SignArbitraryMsgAsAddr"
-	// BitnamesServiceVerifySignatureProcedure is the fully-qualified name of the BitnamesService's
-	// VerifySignature RPC.
-	BitnamesServiceVerifySignatureProcedure = "/bitnames.v1.BitnamesService/VerifySignature"
 	// BitnamesServiceGetWalletAddressesProcedure is the fully-qualified name of the BitnamesService's
 	// GetWalletAddresses RPC.
 	BitnamesServiceGetWalletAddressesProcedure = "/bitnames.v1.BitnamesService/GetWalletAddresses"
@@ -208,10 +190,6 @@ type BitnamesServiceClient interface {
 	CallRaw(context.Context, *connect.Request[v1.CallRawRequest]) (*connect.Response[v1.CallRawResponse], error)
 	// Get BitName data by name.
 	GetBitNameData(context.Context, *connect.Request[v1.GetBitNameDataRequest]) (*connect.Response[v1.GetBitNameDataResponse], error)
-	// Get BitName data at an exact block/transaction position.
-	GetBitNameDataAtPosition(context.Context, *connect.Request[v1.GetBitNameDataAtPositionRequest]) (*connect.Response[v1.GetBitNameDataAtPositionResponse], error)
-	// Get transaction confirmation information.
-	GetTransactionInfo(context.Context, *connect.Request[v1.GetTransactionInfoRequest]) (*connect.Response[v1.GetTransactionInfoResponse], error)
 	// List all BitNames.
 	ListBitNames(context.Context, *connect.Request[v1.ListBitNamesRequest]) (*connect.Response[v1.ListBitNamesResponse], error)
 	// Register a BitName.
@@ -228,20 +206,12 @@ type BitnamesServiceClient interface {
 	EncryptMsg(context.Context, *connect.Request[v1.EncryptMsgRequest]) (*connect.Response[v1.EncryptMsgResponse], error)
 	// Get paymail information.
 	GetPaymail(context.Context, *connect.Request[v1.GetPaymailRequest]) (*connect.Response[v1.GetPaymailResponse], error)
-	// Get JSON-safe, ordered paymail entries with recipient attribution.
-	GetPaymailEntries(context.Context, *connect.Request[v1.GetPaymailEntriesRequest]) (*connect.Response[v1.GetPaymailEntriesResponse], error)
-	// Resolve a BitName to its current ownership output and data.
-	ResolveBitName(context.Context, *connect.Request[v1.ResolveBitNameRequest]) (*connect.Response[v1.ResolveBitNameResponse], error)
-	// Update mutable data for an owned BitName.
-	UpdateBitName(context.Context, *connect.Request[v1.UpdateBitNameRequest]) (*connect.Response[v1.UpdateBitNameResponse], error)
 	// Resolve a commitment from a BitName.
 	ResolveCommit(context.Context, *connect.Request[v1.ResolveCommitRequest]) (*connect.Response[v1.ResolveCommitResponse], error)
 	// Sign an arbitrary message with the specified verifying key.
 	SignArbitraryMsg(context.Context, *connect.Request[v1.SignArbitraryMsgRequest]) (*connect.Response[v1.SignArbitraryMsgResponse], error)
 	// Sign an arbitrary message as a specific address.
 	SignArbitraryMsgAsAddr(context.Context, *connect.Request[v1.SignArbitraryMsgAsAddrRequest]) (*connect.Response[v1.SignArbitraryMsgAsAddrResponse], error)
-	// Verify a signature using the specified domain separation tag.
-	VerifySignature(context.Context, *connect.Request[v1.VerifySignatureRequest]) (*connect.Response[v1.VerifySignatureResponse], error)
 	// Get wallet addresses.
 	GetWalletAddresses(context.Context, *connect.Request[v1.GetWalletAddressesRequest]) (*connect.Response[v1.GetWalletAddressesResponse], error)
 	// List owned UTXOs.
@@ -399,18 +369,6 @@ func NewBitnamesServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			connect.WithSchema(bitnamesServiceMethods.ByName("GetBitNameData")),
 			connect.WithClientOptions(opts...),
 		),
-		getBitNameDataAtPosition: connect.NewClient[v1.GetBitNameDataAtPositionRequest, v1.GetBitNameDataAtPositionResponse](
-			httpClient,
-			baseURL+BitnamesServiceGetBitNameDataAtPositionProcedure,
-			connect.WithSchema(bitnamesServiceMethods.ByName("GetBitNameDataAtPosition")),
-			connect.WithClientOptions(opts...),
-		),
-		getTransactionInfo: connect.NewClient[v1.GetTransactionInfoRequest, v1.GetTransactionInfoResponse](
-			httpClient,
-			baseURL+BitnamesServiceGetTransactionInfoProcedure,
-			connect.WithSchema(bitnamesServiceMethods.ByName("GetTransactionInfo")),
-			connect.WithClientOptions(opts...),
-		),
 		listBitNames: connect.NewClient[v1.ListBitNamesRequest, v1.ListBitNamesResponse](
 			httpClient,
 			baseURL+BitnamesServiceListBitNamesProcedure,
@@ -459,24 +417,6 @@ func NewBitnamesServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			connect.WithSchema(bitnamesServiceMethods.ByName("GetPaymail")),
 			connect.WithClientOptions(opts...),
 		),
-		getPaymailEntries: connect.NewClient[v1.GetPaymailEntriesRequest, v1.GetPaymailEntriesResponse](
-			httpClient,
-			baseURL+BitnamesServiceGetPaymailEntriesProcedure,
-			connect.WithSchema(bitnamesServiceMethods.ByName("GetPaymailEntries")),
-			connect.WithClientOptions(opts...),
-		),
-		resolveBitName: connect.NewClient[v1.ResolveBitNameRequest, v1.ResolveBitNameResponse](
-			httpClient,
-			baseURL+BitnamesServiceResolveBitNameProcedure,
-			connect.WithSchema(bitnamesServiceMethods.ByName("ResolveBitName")),
-			connect.WithClientOptions(opts...),
-		),
-		updateBitName: connect.NewClient[v1.UpdateBitNameRequest, v1.UpdateBitNameResponse](
-			httpClient,
-			baseURL+BitnamesServiceUpdateBitNameProcedure,
-			connect.WithSchema(bitnamesServiceMethods.ByName("UpdateBitName")),
-			connect.WithClientOptions(opts...),
-		),
 		resolveCommit: connect.NewClient[v1.ResolveCommitRequest, v1.ResolveCommitResponse](
 			httpClient,
 			baseURL+BitnamesServiceResolveCommitProcedure,
@@ -493,12 +433,6 @@ func NewBitnamesServiceClient(httpClient connect.HTTPClient, baseURL string, opt
 			httpClient,
 			baseURL+BitnamesServiceSignArbitraryMsgAsAddrProcedure,
 			connect.WithSchema(bitnamesServiceMethods.ByName("SignArbitraryMsgAsAddr")),
-			connect.WithClientOptions(opts...),
-		),
-		verifySignature: connect.NewClient[v1.VerifySignatureRequest, v1.VerifySignatureResponse](
-			httpClient,
-			baseURL+BitnamesServiceVerifySignatureProcedure,
-			connect.WithSchema(bitnamesServiceMethods.ByName("VerifySignature")),
 			connect.WithClientOptions(opts...),
 		),
 		getWalletAddresses: connect.NewClient[v1.GetWalletAddressesRequest, v1.GetWalletAddressesResponse](
@@ -547,8 +481,6 @@ type bitnamesServiceClient struct {
 	setSeedFromMnemonic                   *connect.Client[v1.SetSeedFromMnemonicRequest, v1.SetSeedFromMnemonicResponse]
 	callRaw                               *connect.Client[v1.CallRawRequest, v1.CallRawResponse]
 	getBitNameData                        *connect.Client[v1.GetBitNameDataRequest, v1.GetBitNameDataResponse]
-	getBitNameDataAtPosition              *connect.Client[v1.GetBitNameDataAtPositionRequest, v1.GetBitNameDataAtPositionResponse]
-	getTransactionInfo                    *connect.Client[v1.GetTransactionInfoRequest, v1.GetTransactionInfoResponse]
 	listBitNames                          *connect.Client[v1.ListBitNamesRequest, v1.ListBitNamesResponse]
 	registerBitName                       *connect.Client[v1.RegisterBitNameRequest, v1.RegisterBitNameResponse]
 	reserveBitName                        *connect.Client[v1.ReserveBitNameRequest, v1.ReserveBitNameResponse]
@@ -557,13 +489,9 @@ type bitnamesServiceClient struct {
 	decryptMsg                            *connect.Client[v1.DecryptMsgRequest, v1.DecryptMsgResponse]
 	encryptMsg                            *connect.Client[v1.EncryptMsgRequest, v1.EncryptMsgResponse]
 	getPaymail                            *connect.Client[v1.GetPaymailRequest, v1.GetPaymailResponse]
-	getPaymailEntries                     *connect.Client[v1.GetPaymailEntriesRequest, v1.GetPaymailEntriesResponse]
-	resolveBitName                        *connect.Client[v1.ResolveBitNameRequest, v1.ResolveBitNameResponse]
-	updateBitName                         *connect.Client[v1.UpdateBitNameRequest, v1.UpdateBitNameResponse]
 	resolveCommit                         *connect.Client[v1.ResolveCommitRequest, v1.ResolveCommitResponse]
 	signArbitraryMsg                      *connect.Client[v1.SignArbitraryMsgRequest, v1.SignArbitraryMsgResponse]
 	signArbitraryMsgAsAddr                *connect.Client[v1.SignArbitraryMsgAsAddrRequest, v1.SignArbitraryMsgAsAddrResponse]
-	verifySignature                       *connect.Client[v1.VerifySignatureRequest, v1.VerifySignatureResponse]
 	getWalletAddresses                    *connect.Client[v1.GetWalletAddressesRequest, v1.GetWalletAddressesResponse]
 	myUtxos                               *connect.Client[v1.MyUtxosRequest, v1.MyUtxosResponse]
 	openapiSchema                         *connect.Client[v1.OpenapiSchemaRequest, v1.OpenapiSchemaResponse]
@@ -685,16 +613,6 @@ func (c *bitnamesServiceClient) GetBitNameData(ctx context.Context, req *connect
 	return c.getBitNameData.CallUnary(ctx, req)
 }
 
-// GetBitNameDataAtPosition calls bitnames.v1.BitnamesService.GetBitNameDataAtPosition.
-func (c *bitnamesServiceClient) GetBitNameDataAtPosition(ctx context.Context, req *connect.Request[v1.GetBitNameDataAtPositionRequest]) (*connect.Response[v1.GetBitNameDataAtPositionResponse], error) {
-	return c.getBitNameDataAtPosition.CallUnary(ctx, req)
-}
-
-// GetTransactionInfo calls bitnames.v1.BitnamesService.GetTransactionInfo.
-func (c *bitnamesServiceClient) GetTransactionInfo(ctx context.Context, req *connect.Request[v1.GetTransactionInfoRequest]) (*connect.Response[v1.GetTransactionInfoResponse], error) {
-	return c.getTransactionInfo.CallUnary(ctx, req)
-}
-
 // ListBitNames calls bitnames.v1.BitnamesService.ListBitNames.
 func (c *bitnamesServiceClient) ListBitNames(ctx context.Context, req *connect.Request[v1.ListBitNamesRequest]) (*connect.Response[v1.ListBitNamesResponse], error) {
 	return c.listBitNames.CallUnary(ctx, req)
@@ -735,21 +653,6 @@ func (c *bitnamesServiceClient) GetPaymail(ctx context.Context, req *connect.Req
 	return c.getPaymail.CallUnary(ctx, req)
 }
 
-// GetPaymailEntries calls bitnames.v1.BitnamesService.GetPaymailEntries.
-func (c *bitnamesServiceClient) GetPaymailEntries(ctx context.Context, req *connect.Request[v1.GetPaymailEntriesRequest]) (*connect.Response[v1.GetPaymailEntriesResponse], error) {
-	return c.getPaymailEntries.CallUnary(ctx, req)
-}
-
-// ResolveBitName calls bitnames.v1.BitnamesService.ResolveBitName.
-func (c *bitnamesServiceClient) ResolveBitName(ctx context.Context, req *connect.Request[v1.ResolveBitNameRequest]) (*connect.Response[v1.ResolveBitNameResponse], error) {
-	return c.resolveBitName.CallUnary(ctx, req)
-}
-
-// UpdateBitName calls bitnames.v1.BitnamesService.UpdateBitName.
-func (c *bitnamesServiceClient) UpdateBitName(ctx context.Context, req *connect.Request[v1.UpdateBitNameRequest]) (*connect.Response[v1.UpdateBitNameResponse], error) {
-	return c.updateBitName.CallUnary(ctx, req)
-}
-
 // ResolveCommit calls bitnames.v1.BitnamesService.ResolveCommit.
 func (c *bitnamesServiceClient) ResolveCommit(ctx context.Context, req *connect.Request[v1.ResolveCommitRequest]) (*connect.Response[v1.ResolveCommitResponse], error) {
 	return c.resolveCommit.CallUnary(ctx, req)
@@ -763,11 +666,6 @@ func (c *bitnamesServiceClient) SignArbitraryMsg(ctx context.Context, req *conne
 // SignArbitraryMsgAsAddr calls bitnames.v1.BitnamesService.SignArbitraryMsgAsAddr.
 func (c *bitnamesServiceClient) SignArbitraryMsgAsAddr(ctx context.Context, req *connect.Request[v1.SignArbitraryMsgAsAddrRequest]) (*connect.Response[v1.SignArbitraryMsgAsAddrResponse], error) {
 	return c.signArbitraryMsgAsAddr.CallUnary(ctx, req)
-}
-
-// VerifySignature calls bitnames.v1.BitnamesService.VerifySignature.
-func (c *bitnamesServiceClient) VerifySignature(ctx context.Context, req *connect.Request[v1.VerifySignatureRequest]) (*connect.Response[v1.VerifySignatureResponse], error) {
-	return c.verifySignature.CallUnary(ctx, req)
 }
 
 // GetWalletAddresses calls bitnames.v1.BitnamesService.GetWalletAddresses.
@@ -833,10 +731,6 @@ type BitnamesServiceHandler interface {
 	CallRaw(context.Context, *connect.Request[v1.CallRawRequest]) (*connect.Response[v1.CallRawResponse], error)
 	// Get BitName data by name.
 	GetBitNameData(context.Context, *connect.Request[v1.GetBitNameDataRequest]) (*connect.Response[v1.GetBitNameDataResponse], error)
-	// Get BitName data at an exact block/transaction position.
-	GetBitNameDataAtPosition(context.Context, *connect.Request[v1.GetBitNameDataAtPositionRequest]) (*connect.Response[v1.GetBitNameDataAtPositionResponse], error)
-	// Get transaction confirmation information.
-	GetTransactionInfo(context.Context, *connect.Request[v1.GetTransactionInfoRequest]) (*connect.Response[v1.GetTransactionInfoResponse], error)
 	// List all BitNames.
 	ListBitNames(context.Context, *connect.Request[v1.ListBitNamesRequest]) (*connect.Response[v1.ListBitNamesResponse], error)
 	// Register a BitName.
@@ -853,20 +747,12 @@ type BitnamesServiceHandler interface {
 	EncryptMsg(context.Context, *connect.Request[v1.EncryptMsgRequest]) (*connect.Response[v1.EncryptMsgResponse], error)
 	// Get paymail information.
 	GetPaymail(context.Context, *connect.Request[v1.GetPaymailRequest]) (*connect.Response[v1.GetPaymailResponse], error)
-	// Get JSON-safe, ordered paymail entries with recipient attribution.
-	GetPaymailEntries(context.Context, *connect.Request[v1.GetPaymailEntriesRequest]) (*connect.Response[v1.GetPaymailEntriesResponse], error)
-	// Resolve a BitName to its current ownership output and data.
-	ResolveBitName(context.Context, *connect.Request[v1.ResolveBitNameRequest]) (*connect.Response[v1.ResolveBitNameResponse], error)
-	// Update mutable data for an owned BitName.
-	UpdateBitName(context.Context, *connect.Request[v1.UpdateBitNameRequest]) (*connect.Response[v1.UpdateBitNameResponse], error)
 	// Resolve a commitment from a BitName.
 	ResolveCommit(context.Context, *connect.Request[v1.ResolveCommitRequest]) (*connect.Response[v1.ResolveCommitResponse], error)
 	// Sign an arbitrary message with the specified verifying key.
 	SignArbitraryMsg(context.Context, *connect.Request[v1.SignArbitraryMsgRequest]) (*connect.Response[v1.SignArbitraryMsgResponse], error)
 	// Sign an arbitrary message as a specific address.
 	SignArbitraryMsgAsAddr(context.Context, *connect.Request[v1.SignArbitraryMsgAsAddrRequest]) (*connect.Response[v1.SignArbitraryMsgAsAddrResponse], error)
-	// Verify a signature using the specified domain separation tag.
-	VerifySignature(context.Context, *connect.Request[v1.VerifySignatureRequest]) (*connect.Response[v1.VerifySignatureResponse], error)
 	// Get wallet addresses.
 	GetWalletAddresses(context.Context, *connect.Request[v1.GetWalletAddressesRequest]) (*connect.Response[v1.GetWalletAddressesResponse], error)
 	// List owned UTXOs.
@@ -1020,18 +906,6 @@ func NewBitnamesServiceHandler(svc BitnamesServiceHandler, opts ...connect.Handl
 		connect.WithSchema(bitnamesServiceMethods.ByName("GetBitNameData")),
 		connect.WithHandlerOptions(opts...),
 	)
-	bitnamesServiceGetBitNameDataAtPositionHandler := connect.NewUnaryHandler(
-		BitnamesServiceGetBitNameDataAtPositionProcedure,
-		svc.GetBitNameDataAtPosition,
-		connect.WithSchema(bitnamesServiceMethods.ByName("GetBitNameDataAtPosition")),
-		connect.WithHandlerOptions(opts...),
-	)
-	bitnamesServiceGetTransactionInfoHandler := connect.NewUnaryHandler(
-		BitnamesServiceGetTransactionInfoProcedure,
-		svc.GetTransactionInfo,
-		connect.WithSchema(bitnamesServiceMethods.ByName("GetTransactionInfo")),
-		connect.WithHandlerOptions(opts...),
-	)
 	bitnamesServiceListBitNamesHandler := connect.NewUnaryHandler(
 		BitnamesServiceListBitNamesProcedure,
 		svc.ListBitNames,
@@ -1080,24 +954,6 @@ func NewBitnamesServiceHandler(svc BitnamesServiceHandler, opts ...connect.Handl
 		connect.WithSchema(bitnamesServiceMethods.ByName("GetPaymail")),
 		connect.WithHandlerOptions(opts...),
 	)
-	bitnamesServiceGetPaymailEntriesHandler := connect.NewUnaryHandler(
-		BitnamesServiceGetPaymailEntriesProcedure,
-		svc.GetPaymailEntries,
-		connect.WithSchema(bitnamesServiceMethods.ByName("GetPaymailEntries")),
-		connect.WithHandlerOptions(opts...),
-	)
-	bitnamesServiceResolveBitNameHandler := connect.NewUnaryHandler(
-		BitnamesServiceResolveBitNameProcedure,
-		svc.ResolveBitName,
-		connect.WithSchema(bitnamesServiceMethods.ByName("ResolveBitName")),
-		connect.WithHandlerOptions(opts...),
-	)
-	bitnamesServiceUpdateBitNameHandler := connect.NewUnaryHandler(
-		BitnamesServiceUpdateBitNameProcedure,
-		svc.UpdateBitName,
-		connect.WithSchema(bitnamesServiceMethods.ByName("UpdateBitName")),
-		connect.WithHandlerOptions(opts...),
-	)
 	bitnamesServiceResolveCommitHandler := connect.NewUnaryHandler(
 		BitnamesServiceResolveCommitProcedure,
 		svc.ResolveCommit,
@@ -1114,12 +970,6 @@ func NewBitnamesServiceHandler(svc BitnamesServiceHandler, opts ...connect.Handl
 		BitnamesServiceSignArbitraryMsgAsAddrProcedure,
 		svc.SignArbitraryMsgAsAddr,
 		connect.WithSchema(bitnamesServiceMethods.ByName("SignArbitraryMsgAsAddr")),
-		connect.WithHandlerOptions(opts...),
-	)
-	bitnamesServiceVerifySignatureHandler := connect.NewUnaryHandler(
-		BitnamesServiceVerifySignatureProcedure,
-		svc.VerifySignature,
-		connect.WithSchema(bitnamesServiceMethods.ByName("VerifySignature")),
 		connect.WithHandlerOptions(opts...),
 	)
 	bitnamesServiceGetWalletAddressesHandler := connect.NewUnaryHandler(
@@ -1188,10 +1038,6 @@ func NewBitnamesServiceHandler(svc BitnamesServiceHandler, opts ...connect.Handl
 			bitnamesServiceCallRawHandler.ServeHTTP(w, r)
 		case BitnamesServiceGetBitNameDataProcedure:
 			bitnamesServiceGetBitNameDataHandler.ServeHTTP(w, r)
-		case BitnamesServiceGetBitNameDataAtPositionProcedure:
-			bitnamesServiceGetBitNameDataAtPositionHandler.ServeHTTP(w, r)
-		case BitnamesServiceGetTransactionInfoProcedure:
-			bitnamesServiceGetTransactionInfoHandler.ServeHTTP(w, r)
 		case BitnamesServiceListBitNamesProcedure:
 			bitnamesServiceListBitNamesHandler.ServeHTTP(w, r)
 		case BitnamesServiceRegisterBitNameProcedure:
@@ -1208,20 +1054,12 @@ func NewBitnamesServiceHandler(svc BitnamesServiceHandler, opts ...connect.Handl
 			bitnamesServiceEncryptMsgHandler.ServeHTTP(w, r)
 		case BitnamesServiceGetPaymailProcedure:
 			bitnamesServiceGetPaymailHandler.ServeHTTP(w, r)
-		case BitnamesServiceGetPaymailEntriesProcedure:
-			bitnamesServiceGetPaymailEntriesHandler.ServeHTTP(w, r)
-		case BitnamesServiceResolveBitNameProcedure:
-			bitnamesServiceResolveBitNameHandler.ServeHTTP(w, r)
-		case BitnamesServiceUpdateBitNameProcedure:
-			bitnamesServiceUpdateBitNameHandler.ServeHTTP(w, r)
 		case BitnamesServiceResolveCommitProcedure:
 			bitnamesServiceResolveCommitHandler.ServeHTTP(w, r)
 		case BitnamesServiceSignArbitraryMsgProcedure:
 			bitnamesServiceSignArbitraryMsgHandler.ServeHTTP(w, r)
 		case BitnamesServiceSignArbitraryMsgAsAddrProcedure:
 			bitnamesServiceSignArbitraryMsgAsAddrHandler.ServeHTTP(w, r)
-		case BitnamesServiceVerifySignatureProcedure:
-			bitnamesServiceVerifySignatureHandler.ServeHTTP(w, r)
 		case BitnamesServiceGetWalletAddressesProcedure:
 			bitnamesServiceGetWalletAddressesHandler.ServeHTTP(w, r)
 		case BitnamesServiceMyUtxosProcedure:
@@ -1329,14 +1167,6 @@ func (UnimplementedBitnamesServiceHandler) GetBitNameData(context.Context, *conn
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bitnames.v1.BitnamesService.GetBitNameData is not implemented"))
 }
 
-func (UnimplementedBitnamesServiceHandler) GetBitNameDataAtPosition(context.Context, *connect.Request[v1.GetBitNameDataAtPositionRequest]) (*connect.Response[v1.GetBitNameDataAtPositionResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bitnames.v1.BitnamesService.GetBitNameDataAtPosition is not implemented"))
-}
-
-func (UnimplementedBitnamesServiceHandler) GetTransactionInfo(context.Context, *connect.Request[v1.GetTransactionInfoRequest]) (*connect.Response[v1.GetTransactionInfoResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bitnames.v1.BitnamesService.GetTransactionInfo is not implemented"))
-}
-
 func (UnimplementedBitnamesServiceHandler) ListBitNames(context.Context, *connect.Request[v1.ListBitNamesRequest]) (*connect.Response[v1.ListBitNamesResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bitnames.v1.BitnamesService.ListBitNames is not implemented"))
 }
@@ -1369,18 +1199,6 @@ func (UnimplementedBitnamesServiceHandler) GetPaymail(context.Context, *connect.
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bitnames.v1.BitnamesService.GetPaymail is not implemented"))
 }
 
-func (UnimplementedBitnamesServiceHandler) GetPaymailEntries(context.Context, *connect.Request[v1.GetPaymailEntriesRequest]) (*connect.Response[v1.GetPaymailEntriesResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bitnames.v1.BitnamesService.GetPaymailEntries is not implemented"))
-}
-
-func (UnimplementedBitnamesServiceHandler) ResolveBitName(context.Context, *connect.Request[v1.ResolveBitNameRequest]) (*connect.Response[v1.ResolveBitNameResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bitnames.v1.BitnamesService.ResolveBitName is not implemented"))
-}
-
-func (UnimplementedBitnamesServiceHandler) UpdateBitName(context.Context, *connect.Request[v1.UpdateBitNameRequest]) (*connect.Response[v1.UpdateBitNameResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bitnames.v1.BitnamesService.UpdateBitName is not implemented"))
-}
-
 func (UnimplementedBitnamesServiceHandler) ResolveCommit(context.Context, *connect.Request[v1.ResolveCommitRequest]) (*connect.Response[v1.ResolveCommitResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bitnames.v1.BitnamesService.ResolveCommit is not implemented"))
 }
@@ -1391,10 +1209,6 @@ func (UnimplementedBitnamesServiceHandler) SignArbitraryMsg(context.Context, *co
 
 func (UnimplementedBitnamesServiceHandler) SignArbitraryMsgAsAddr(context.Context, *connect.Request[v1.SignArbitraryMsgAsAddrRequest]) (*connect.Response[v1.SignArbitraryMsgAsAddrResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bitnames.v1.BitnamesService.SignArbitraryMsgAsAddr is not implemented"))
-}
-
-func (UnimplementedBitnamesServiceHandler) VerifySignature(context.Context, *connect.Request[v1.VerifySignatureRequest]) (*connect.Response[v1.VerifySignatureResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("bitnames.v1.BitnamesService.VerifySignature is not implemented"))
 }
 
 func (UnimplementedBitnamesServiceHandler) GetWalletAddresses(context.Context, *connect.Request[v1.GetWalletAddressesRequest]) (*connect.Response[v1.GetWalletAddressesResponse], error) {
