@@ -5,7 +5,28 @@ import 'package:get_it/get_it.dart';
 import 'package:logger/logger.dart';
 import 'package:sail_ui/env.dart';
 import 'package:sail_ui/gen/bitcoin/bitcoind/v1alpha/bitcoin.pb.dart';
+import 'package:sail_ui/gen/bitwindowd/v1/bitwindowd.pb.dart';
 import 'package:sail_ui/sail_ui.dart';
+
+/// Merge the first page of tip blocks from [listBlocks] into the existing list.
+/// Returns the new list and height set. Pure so unit tests can drive it without
+/// standing up RPC / GetIt (#1861).
+(List<Block> blocks, Set<int> heights) mergeTipBlocks(
+  List<Block> existing,
+  Set<int> existingHeights,
+  List<Block> tipPage,
+) {
+  if (existing.isEmpty) {
+    return (List<Block>.from(tipPage), tipPage.map((b) => b.height).toSet());
+  }
+  final toAdd = tipPage.where((b) => !existingHeights.contains(b.height)).toList();
+  if (toAdd.isEmpty) {
+    return (existing, existingHeights);
+  }
+  final heights = {...existingHeights, ...toAdd.map((b) => b.height)};
+  final blocks = [...toAdd, ...existing]..sort((a, b) => b.height.compareTo(a.height));
+  return (blocks, heights);
+}
 
 class BlockchainProvider extends ChangeNotifier implements NetworkScoped {
   @override
@@ -52,12 +73,15 @@ class BlockchainProvider extends ChangeNotifier implements NetworkScoped {
       final newTXs = await bitwindowd.bitwindowd.listRecentTransactions();
       final (newBlocks, hasMore) = await bitwindowd.bitwindowd.listBlocks();
 
-      if (_dataHasChanged(newPeers, newTXs, newBlocks)) {
+      final (mergedBlocks, mergedHeights) = mergeTipBlocks(blocks, loadedBlockHeights, newBlocks);
+      final blocksChanged = !listEquals(blocks, mergedBlocks);
+
+      if (_dataHasChanged(newPeers, newTXs, blocksChanged)) {
         peers = newPeers;
         recentTransactions = newTXs;
-        if (blocks.isEmpty) {
-          blocks = newBlocks;
-          loadedBlockHeights = newBlocks.map((b) => b.height).toSet();
+        if (blocksChanged) {
+          blocks = mergedBlocks;
+          loadedBlockHeights = mergedHeights;
         }
         hasMoreBlocks = hasMore;
         error = null;
@@ -73,7 +97,7 @@ class BlockchainProvider extends ChangeNotifier implements NetworkScoped {
   bool _dataHasChanged(
     List<Peer> newPeers,
     List<RecentTransaction> newTXs,
-    List<Block> newBlocks,
+    bool blocksChanged,
   ) {
     if (!listEquals(peers, newPeers)) {
       return true;
@@ -83,7 +107,7 @@ class BlockchainProvider extends ChangeNotifier implements NetworkScoped {
       return true;
     }
 
-    if (!listEquals(blocks, newBlocks)) {
+    if (blocksChanged) {
       return true;
     }
 
@@ -170,6 +194,9 @@ class BlockchainProvider extends ChangeNotifier implements NetworkScoped {
     _fetchTimer?.cancel();
     _fetchTimer = null;
     mainchain.removeListener(fetch);
+    bitwindowd.removeListener(fetch);
+    enforcer.removeListener(fetch);
+    syncProvider.removeListener(notifyListeners);
     super.dispose();
   }
 }
