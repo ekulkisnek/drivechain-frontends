@@ -266,115 +266,135 @@ class _SailConfigureHomePageState extends State<SailConfigureHomePage> {
   ) async {
     final allWidgets = widget.widgetCatalog.values.toList();
 
-    // Filter out widgets that are already added
-    final availableWidgets = allWidgets.where((widget) {
-      return !model.tempConfiguration.widgets.any(
-        (w) => w.widgetId == widget.id,
-      );
-    }).toList();
+    List<HomepageWidgetInfo> availableOf() {
+      return allWidgets.where((w) {
+        return !model.tempConfiguration.widgets.any(
+          (entry) => entry.widgetId == w.id,
+        );
+      }).toList();
+    }
 
-    if (availableWidgets.isEmpty) {
+    if (availableOf().isEmpty) {
       showSnackBar(context, 'All available widgets have been added');
       return;
     }
 
+    // Keep dialog open across multiple Adds (#1808). StatefulBuilder refreshes
+    // the available list; only Close dismisses.
     await showDialog(
       context: context,
-      builder: (context) => Dialog(
-        backgroundColor: context.sailTheme.colors.background,
-        surfaceTintColor: Colors.transparent,
-        child: Container(
-          width: 600,
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: context.sailTheme.colors.background,
-            borderRadius: SailStyleValues.borderRadius,
-            border: Border.all(color: context.sailTheme.colors.border),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SailText.primary20('Add Widget'),
-              const SizedBox(height: 16),
-              SailText.secondary13('Select a widget to add to your homepage'),
-              const SizedBox(height: 24),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 400),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: availableWidgets.map((widget) {
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        decoration: BoxDecoration(
-                          color: context.sailTheme.colors.backgroundSecondary,
-                          borderRadius: SailStyleValues.borderRadius,
-                          border: Border.all(
-                            color: context.sailTheme.colors.border,
-                          ),
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            final availableWidgets = availableOf();
+            return Dialog(
+              backgroundColor: context.sailTheme.colors.background,
+              surfaceTintColor: Colors.transparent,
+              child: Container(
+                width: 600,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: context.sailTheme.colors.background,
+                  borderRadius: SailStyleValues.borderRadius,
+                  border: Border.all(color: context.sailTheme.colors.border),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SailText.primary20('Add Widget'),
+                    const SizedBox(height: 16),
+                    SailText.secondary13(
+                      'Select widgets to add. Dialog stays open for multiple adds.',
+                    ),
+                    const SizedBox(height: 24),
+                    if (availableWidgets.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        child: SailText.secondary13(
+                          'All available widgets have been added',
                         ),
-                        child: ListTile(
-                          tileColor: Colors.transparent,
-                          leading: SailSVG.icon(widget.icon, width: 32),
-                          title: SailText.primary15(widget.name),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SailText.secondary12(widget.description),
-                              const SizedBox(height: 4),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 2,
-                                ),
+                      )
+                    else
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxHeight: 400),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: availableWidgets.map((w) {
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 8),
                                 decoration: BoxDecoration(
-                                  color: widget.size == WidgetSize.full
-                                      ? Colors.blue.withValues(alpha: 0.1)
-                                      : widget.size == WidgetSize.bar
-                                      ? Colors.purple.withValues(alpha: 0.1)
-                                      : Colors.green.withValues(alpha: 0.1),
+                                  color: context.sailTheme.colors.backgroundSecondary,
                                   borderRadius: SailStyleValues.borderRadius,
+                                  border: Border.all(
+                                    color: context.sailTheme.colors.border,
+                                  ),
                                 ),
-                                child: SailText.secondary12(
-                                  widget.size == WidgetSize.full
-                                      ? 'Full Width'
-                                      : widget.size == WidgetSize.bar
-                                      ? 'Bar'
-                                      : 'Half Width',
+                                child: ListTile(
+                                  tileColor: Colors.transparent,
+                                  leading: SailSVG.icon(w.icon, width: 32),
+                                  title: SailText.primary15(w.name),
+                                  subtitle: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      SailText.secondary12(w.description),
+                                      const SizedBox(height: 4),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 2,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: w.size == WidgetSize.full
+                                              ? Colors.blue.withValues(alpha: 0.1)
+                                              : w.size == WidgetSize.bar
+                                              ? Colors.purple.withValues(alpha: 0.1)
+                                              : Colors.green.withValues(alpha: 0.1),
+                                          borderRadius: SailStyleValues.borderRadius,
+                                        ),
+                                        child: SailText.secondary12(
+                                          w.size == WidgetSize.full
+                                              ? 'Full Width'
+                                              : w.size == WidgetSize.bar
+                                              ? 'Bar'
+                                              : 'Half Width',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: SailButton(
+                                    label: 'Add',
+                                    onPressed: () async {
+                                      model.addWidget(w.id);
+                                      setDialogState(() {});
+                                    },
+                                    variant: ButtonVariant.primary,
+                                    small: true,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          trailing: SailButton(
-                            label: 'Add',
-                            onPressed: () async {
-                              model.addWidget(widget.id);
-                              Navigator.of(context).pop();
-                            },
-                            variant: ButtonVariant.primary,
-                            small: true,
+                              );
+                            }).toList(),
                           ),
                         ),
-                      );
-                    }).toList(),
-                  ),
+                      ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        SailButton(
+                          label: 'Close',
+                          onPressed: () async => Navigator.of(dialogContext).pop(),
+                          variant: ButtonVariant.secondary,
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SailButton(
-                    label: 'Close',
-                    onPressed: () async => Navigator.of(context).pop(),
-                    variant: ButtonVariant.secondary,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+            );
+          },
+        );
+      },
     );
   }
 }
